@@ -1,13 +1,46 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .statistics-card-wrapper {
+    @apply rounded-md max-w-full w-80 md:w-3/5 xl:w-1/4 bg-white relative text-left my-8 lg:my-0 lg:mx-4;
+    height: min-content;
+  }
+
+  .btn {
+    @apply px-4 py-2 text-white bg-green-400 font-semibold focus:outline-none focus:ring focus:ring-offset-4 focus:ring-green-400 active:bg-green-500 hover:bg-green-300 transform transition
+  }
+
+  .socials-logo{
+    @apply w-6 h-6
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.form-section {
+  background-image: url('/src/assets/bg-shorten-desktop.svg');
+}
+
+.boost-banner-desktop {
+  background-image: url('/src/assets/bg-boost-desktop.svg');
+}
+.boost-banner-mobile {
+  background-image: url('/src/assets/bg-boost-mobile.svg');
+}
+
+.footer-logo {
+  filter: invert(100%) sepia(63%) saturate(2%) hue-rotate(319deg) brightness(109%) contrast(100%);
+}
+
+.statistics-icon {
+  top: -40px;
+  left: 30px;
+}
+
+.form-container {
+  position: relative;
 }
