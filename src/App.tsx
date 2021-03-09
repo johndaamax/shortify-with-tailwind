@@ -11,47 +11,84 @@ export interface ShortLinkListItem {
   isCopiedToClipboard: boolean
 }
 
-function App() {
-  const [error, setError] = React.useState<{ error: string, error_code: number } | null>(null)
-  const [inputValue, setInputValue] = React.useState<string>('')
-  const [shortlinkList, setShortlinkList] = React.useState<ShortLinkListItem[]>([])
+type Error = {
+  errorMessage: string,
+  errorCode: number
+}
 
+type Reducer<S, A> = (prevState: S, action: A) => S;
+
+type State = {
+  error: { errorMessage: string, errorCode: number } | null,
+  inputValue: string
+  shortlinkList: ShortLinkListItem[],
+  isLoading: boolean
+}
+
+type Action =
+  | { type: 'REQUEST_STARTED' }
+  | { type: 'REQUEST_SUCCESS', data: any }
+  | { type: 'REQUEST_FAILURE', error: Error }
+  | { type: 'USER_INPUT_CHANGE', value: string }
+  | { type: 'UPDATE_SHORTLINK_LIST', list: ShortLinkListItem[] };
+
+const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
+  switch (action.type) {
+    case 'REQUEST_STARTED':
+      return { ...state, isLoading: true }
+    case 'REQUEST_SUCCESS':
+      return {
+        error: null,
+        inputValue: '',
+        shortlinkList: [{
+          originalLink: action.data.result.original_link,
+          shortLink: action.data.result.full_short_link,
+          isCopiedToClipboard: false
+        }, ...state.shortlinkList],
+        isLoading: false
+      }
+    case 'REQUEST_FAILURE':
+      return { ...state, error: action.error }
+    case 'USER_INPUT_CHANGE':
+      return { ...state, inputValue: action.value }
+    case 'UPDATE_SHORTLINK_LIST':
+      return { ...state, shortlinkList: action.list }
+    default:
+      throw new Error("Invalid type")
+  }
+}
+
+function App() {
+  const [state, dispatch] = React.useReducer(appReducer, { error: null, inputValue: '', shortlinkList: [], isLoading: false })
   const handleSubmit = async (e: any) => {
     e.preventDefault()
     try {
-      const url = `https://api.shrtco.de/v2/shorten?url=${inputValue}`
+      dispatch({ type: 'REQUEST_STARTED' })
+      const url = `https://api.shrtco.de/v2/shorten?url=${state.inputValue}`
       const data = await (await fetch(url)).json()
       if (data.ok) {
-        if (error)
-          setError(null)
-        setInputValue('')
-        setShortlinkList((prevList) =>
-          [{
-            originalLink: data.result.original_link,
-            shortLink: data.result.full_short_link,
-            isCopiedToClipboard: false
-          }, ...prevList])
+        dispatch({ type: 'REQUEST_SUCCESS', data })
       } else {
-        setError({ error: data.error, error_code: data.error_code })
+        dispatch({ type: 'REQUEST_FAILURE', error: { errorMessage: data.error, errorCode: data.error_code } })
       }
     } catch (err) {
-      setError({ error: 'Error! Failed to fetch.', error_code: 1 })
+      dispatch({ type: 'REQUEST_FAILURE', error: { errorMessage: 'Error! Failed to fetch.', errorCode: 1 } })
     }
   }
 
   const handleChange = (value: string) => {
-    setInputValue(value)
+    dispatch({ type: 'USER_INPUT_CHANGE', value })
   }
 
   const handleShortlinkClick = (index: number) => {
-    if (!shortlinkList[index].isCopiedToClipboard) {
-      navigator.clipboard.writeText(shortlinkList[index].shortLink)
-      const newList = shortlinkList.map(
+    if (!state.shortlinkList[index].isCopiedToClipboard) {
+      navigator.clipboard.writeText(state.shortlinkList[index].shortLink)
+      const newList = state.shortlinkList.map(
         item => {
           return { originalLink: item.originalLink, shortLink: item.shortLink, isCopiedToClipboard: false }
         })
       newList[index].isCopiedToClipboard = true;
-      setShortlinkList(newList)
+      dispatch({ type: 'UPDATE_SHORTLINK_LIST', list: newList })
     }
   }
 
@@ -77,20 +114,25 @@ function App() {
                 <div className='w-full md:mr-6 flex-1'>
                   <input
                     type='text'
-                    value={inputValue}
+                    value={state.inputValue}
                     onChange={(e) => handleChange(e.target.value)}
-                    className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring ${error ? `focus:ring-red-600 focus:ring-offset-red-600 border-2 border-red-600` : `focus:ring-blue-300 focus:ring-offset-blue-300`}`}
+                    className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring ${state.error ? `focus:ring-red-600 focus:ring-offset-red-600 border-2 border-red-600` : `focus:ring-blue-300 focus:ring-offset-blue-300`}`}
                     placeholder='Paste URL here...' />
-                  {error && <small role='alert' className='text-red-600 w-max'>{error.error}</small>}
+                  {state.error && <small role='alert' className='text-red-600 w-max'>{state.error.errorMessage}</small>}
                 </div>
-                <button type='submit' className='btn md:h-min rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-80 disabled:cursor-not-allowed' disabled={!inputValue}>Shorten It!</button>
+                <button
+                  type='submit'
+                  className='btn md:h-min rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-80 disabled:cursor-not-allowed'
+                  disabled={!state.inputValue || state.isLoading}
+                >Shorten It!
+                </button>
               </div>
             </form>
           </div>
         </div>
         <ul>
-          {shortlinkList.length > 0 &&
-            shortlinkList.map((item, idx) =>
+          {state.shortlinkList.length > 0 &&
+            state.shortlinkList.map((item, idx) =>
               <ShortLinkContainer
                 key={item.shortLink}
                 linkData={item}
@@ -112,13 +154,13 @@ function App() {
               description={`Boost your brand recognition with each click. Generic links don't mean a thing. Brand links help instil confidence in your content.`}
             />
             <StatisticsCard
-              className='mt-10'
+              className='lg:mt-10'
               imgSrc='./images/icon-detailed-records.svg'
               title='Detailed Records'
               description={`Gain insights into who is clicking your links. Knowing when and where people engage with your content helps inform better decisions.`}
             />
             <StatisticsCard
-              className='mt-20'
+              className='lg:mt-20'
               imgSrc='./images/icon-fully-customizable.svg'
               title='Fully Customizable'
               description={`Improve brand awareness and content discoverability through customizable links, supercharging audience engagement.`}
