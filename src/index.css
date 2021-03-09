@@ -9,7 +9,8 @@
   }
 
   .btn {
-    @apply px-4 py-2 text-white bg-green-400 font-semibold focus:outline-none focus:ring focus:ring-offset-4 focus:ring-green-400 active:bg-green-500 hover:bg-green-300 transform transition
+    @apply px-6 py-2 text-white bg-green-400 focus:outline-none hover:bg-green-300 transform transition;
+    height: min-content;
   }
 
   .socials-logo{

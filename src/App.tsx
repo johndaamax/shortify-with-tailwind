@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 
 import Header from './components/Header'
@@ -6,30 +5,37 @@ import Footer from './components/Footer'
 import StatisticsCard from './components/StatisticsCard'
 import ShortLinkContainer from './components/ShortLinkContainer'
 
-interface ShortLinkListItem {
+export interface ShortLinkListItem {
   originalLink: string,
-  shortLink: string
+  shortLink: string,
+  isCopiedToClipboard: boolean
 }
 
 function App() {
-
   const [error, setError] = React.useState<{ error: string, error_code: number } | null>(null)
-  const [data, setData] = React.useState(null)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [shortlinkList, setShortlinkList] = React.useState<ShortLinkListItem[]>([])
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    const url = `https://api.shrtco.de/v2/shorten?url=${inputValue}`
-    const data = await (await fetch(url)).json()
-    if (data.ok) {
-      setData(data)
-      setInputValue('')
-      if (error)
-        setError(null)
-      setShortlinkList((prevList) => [{ originalLink: data.result.original_link, shortLink: data.result.full_short_link }, ...prevList])
-    } else {
-      setError({ error: data.error, error_code: data.error_code })
+    try {
+      const url = `https://api.shrtco.de/v2/shorten?url=${inputValue}`
+      const data = await (await fetch(url)).json()
+      if (data.ok) {
+        if (error)
+          setError(null)
+        setInputValue('')
+        setShortlinkList((prevList) =>
+          [{
+            originalLink: data.result.original_link,
+            shortLink: data.result.full_short_link,
+            isCopiedToClipboard: false
+          }, ...prevList])
+      } else {
+        setError({ error: data.error, error_code: data.error_code })
+      }
+    } catch (err) {
+      setError({ error: 'Error! Failed to fetch.', error_code: 1 })
     }
   }
 
@@ -37,9 +43,17 @@ function App() {
     setInputValue(value)
   }
 
-  React.useEffect(() => {
-    data && console.log(data)
-  }, [data])
+  const handleShortlinkClick = (index: number) => {
+    if (!shortlinkList[index].isCopiedToClipboard) {
+      navigator.clipboard.writeText(shortlinkList[index].shortLink)
+      const newList = shortlinkList.map(
+        item => {
+          return { originalLink: item.originalLink, shortLink: item.shortLink, isCopiedToClipboard: false }
+        })
+      newList[index].isCopiedToClipboard = true;
+      setShortlinkList(newList)
+    }
+  }
 
   return (
     <div >
@@ -65,17 +79,25 @@ function App() {
                     type='text'
                     value={inputValue}
                     onChange={(e) => handleChange(e.target.value)}
-                    className='w-full px-4 py-2 rounded-md'
+                    className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring ${error ? `focus:ring-red-600 focus:ring-offset-red-600 border-2 border-red-600` : `focus:ring-blue-300 focus:ring-offset-blue-300`}`}
                     placeholder='Paste URL here...' />
                   {error && <small role='alert' className='text-red-600 w-max'>{error.error}</small>}
                 </div>
-                <button type='submit' className='btn rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-50 disabled:cursor-not-allowed' disabled={!inputValue}>Shorten It!</button>
+                <button type='submit' className='btn md:h-min rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-80 disabled:cursor-not-allowed' disabled={!inputValue}>Shorten It!</button>
               </div>
             </form>
           </div>
         </div>
         <ul>
-          {shortlinkList.length > 0 && shortlinkList.map(li => <ShortLinkContainer key={li.originalLink} originalLink={li.originalLink} shortLink={li.shortLink} />)}
+          {shortlinkList.length > 0 &&
+            shortlinkList.map((item, idx) =>
+              <ShortLinkContainer
+                key={item.shortLink}
+                linkData={item}
+                handleClick={() => handleShortlinkClick(idx)}
+              />
+            )
+          }
         </ul>
         <div className='mt-24 text-center'>
           <h2 className='text-4xl font-bold'>Advanced statistics</h2>
