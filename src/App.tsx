@@ -1,9 +1,12 @@
 import * as React from 'react';
 
+import { useLocalStorageState } from './hooks/useLocalStorage'
+
 import Header from './components/Header'
 import Footer from './components/Footer'
 import StatisticsCard from './components/StatisticsCard'
 import ShortLinkContainer from './components/ShortLinkContainer'
+import Spinner from './components/Spinner'
 
 export interface ShortLinkListItem {
   originalLink: string,
@@ -21,16 +24,14 @@ type Reducer<S, A> = (prevState: S, action: A) => S;
 type State = {
   error: { errorMessage: string, errorCode: number } | null,
   inputValue: string
-  shortlinkList: ShortLinkListItem[],
   isLoading: boolean
 }
 
 type Action =
   | { type: 'REQUEST_STARTED' }
-  | { type: 'REQUEST_SUCCESS', data: any }
+  | { type: 'REQUEST_SUCCESS' }
   | { type: 'REQUEST_FAILURE', error: Error }
   | { type: 'USER_INPUT_CHANGE', value: string }
-  | { type: 'UPDATE_SHORTLINK_LIST', list: ShortLinkListItem[] };
 
 const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
   switch (action.type) {
@@ -40,26 +41,21 @@ const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
       return {
         error: null,
         inputValue: '',
-        shortlinkList: [{
-          originalLink: action.data.result.original_link,
-          shortLink: action.data.result.full_short_link,
-          isCopiedToClipboard: false
-        }, ...state.shortlinkList],
         isLoading: false
       }
     case 'REQUEST_FAILURE':
-      return { ...state, error: action.error }
+      return { ...state, isLoading: false, error: action.error }
     case 'USER_INPUT_CHANGE':
       return { ...state, inputValue: action.value }
-    case 'UPDATE_SHORTLINK_LIST':
-      return { ...state, shortlinkList: action.list }
     default:
       throw new Error("Invalid type")
   }
 }
 
 function App() {
-  const [state, dispatch] = React.useReducer(appReducer, { error: null, inputValue: '', shortlinkList: [], isLoading: false })
+  const [state, dispatch] = React.useReducer(appReducer, { error: null, inputValue: '', isLoading: false })
+  const [shortlinkList, setShortlinkList] = useLocalStorageState<ShortLinkListItem[]>('linkList', [])
+
   const handleSubmit = async (e: any) => {
     e.preventDefault()
     try {
@@ -67,7 +63,15 @@ function App() {
       const url = `https://api.shrtco.de/v2/shorten?url=${state.inputValue}`
       const data = await (await fetch(url)).json()
       if (data.ok) {
-        dispatch({ type: 'REQUEST_SUCCESS', data })
+        dispatch({ type: 'REQUEST_SUCCESS' })
+        if (shortlinkList.length >= 5)
+          shortlinkList.pop()
+        setShortlinkList(
+          [{
+            originalLink: data.result.original_link,
+            shortLink: data.result.full_short_link,
+            isCopiedToClipboard: false
+          }, ...shortlinkList])
       } else {
         dispatch({ type: 'REQUEST_FAILURE', error: { errorMessage: data.error, errorCode: data.error_code } })
       }
@@ -81,14 +85,14 @@ function App() {
   }
 
   const handleShortlinkClick = (index: number) => {
-    if (!state.shortlinkList[index].isCopiedToClipboard) {
-      navigator.clipboard.writeText(state.shortlinkList[index].shortLink)
-      const newList = state.shortlinkList.map(
+    if (!shortlinkList[index].isCopiedToClipboard) {
+      navigator.clipboard.writeText(shortlinkList[index].shortLink)
+      const newList = shortlinkList.map(
         item => {
           return { originalLink: item.originalLink, shortLink: item.shortLink, isCopiedToClipboard: false }
         })
       newList[index].isCopiedToClipboard = true;
-      dispatch({ type: 'UPDATE_SHORTLINK_LIST', list: newList })
+      setShortlinkList(newList)
     }
   }
 
@@ -121,18 +125,20 @@ function App() {
                   {state.error && <small role='alert' className='text-red-600 w-max'>{state.error.errorMessage}</small>}
                 </div>
                 <button
-                  type='submit'
+                  type="submit"
                   className='btn md:h-min rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-80 disabled:cursor-not-allowed'
                   disabled={!state.inputValue || state.isLoading}
-                >Shorten It!
+                >
+                  {state.isLoading && <Spinner />}
+                  {state.isLoading ? `Loading...` : `Shorten It!`}
                 </button>
               </div>
             </form>
           </div>
         </div>
         <ul>
-          {state.shortlinkList.length > 0 &&
-            state.shortlinkList.map((item, idx) =>
+          {shortlinkList.length > 0 &&
+            shortlinkList.map((item, idx) =>
               <ShortLinkContainer
                 key={item.shortLink}
                 linkData={item}

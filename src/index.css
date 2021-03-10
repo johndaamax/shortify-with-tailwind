@@ -9,7 +9,7 @@
   }
 
   .btn {
-    @apply px-6 py-2 text-white bg-green-400 focus:outline-none hover:bg-green-300 transform transition;
+    @apply inline-flex justify-center items-center px-6 py-2 text-white bg-green-400 focus:outline-none hover:bg-green-300 transform transition;
     height: min-content;
   }
 
