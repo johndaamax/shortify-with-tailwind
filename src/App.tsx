@@ -8,6 +8,8 @@ import StatisticsCard from './components/StatisticsCard'
 import ShortLinkContainer from './components/ShortLinkContainer'
 import Spinner from './components/Spinner'
 
+const MAX_LIST_ITEMS = 5
+
 export interface ShortLinkListItem {
   originalLink: string,
   shortLink: string,
@@ -24,7 +26,8 @@ type Reducer<S, A> = (prevState: S, action: A) => S;
 type State = {
   error: { errorMessage: string, errorCode: number } | null,
   inputValue: string
-  isLoading: boolean
+  isLoading: boolean,
+  activeClipboard: string
 }
 
 type Action =
@@ -32,6 +35,7 @@ type Action =
   | { type: 'REQUEST_SUCCESS' }
   | { type: 'REQUEST_FAILURE', error: Error }
   | { type: 'USER_INPUT_CHANGE', value: string }
+  | { type: 'SET_ACTIVE_CLIPBOARD', value: string }
 
 const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
   switch (action.type) {
@@ -39,6 +43,7 @@ const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
       return { ...state, isLoading: true }
     case 'REQUEST_SUCCESS':
       return {
+        ...state,
         error: null,
         inputValue: '',
         isLoading: false
@@ -47,13 +52,21 @@ const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
       return { ...state, isLoading: false, error: action.error }
     case 'USER_INPUT_CHANGE':
       return { ...state, inputValue: action.value }
+    case 'SET_ACTIVE_CLIPBOARD':
+      return { ...state, activeClipboard: action.value }
     default:
       throw new Error("Invalid type")
   }
 }
 
 function App() {
-  const [state, dispatch] = React.useReducer(appReducer, { error: null, inputValue: '', isLoading: false })
+  const [state, dispatch] = React.useReducer(appReducer,
+    {
+      error: null,
+      inputValue: '',
+      isLoading: false,
+      activeClipboard: ''
+    })
   const [shortlinkList, setShortlinkList] = useLocalStorageState<ShortLinkListItem[]>('linkList', [])
 
   const handleSubmit = async (e: any) => {
@@ -64,7 +77,7 @@ function App() {
       const data = await (await fetch(url)).json()
       if (data.ok) {
         dispatch({ type: 'REQUEST_SUCCESS' })
-        if (shortlinkList.length >= 5)
+        if (shortlinkList.length >= MAX_LIST_ITEMS)
           shortlinkList.pop()
         setShortlinkList(
           [{
@@ -84,16 +97,9 @@ function App() {
     dispatch({ type: 'USER_INPUT_CHANGE', value })
   }
 
-  const handleShortlinkClick = (index: number) => {
-    if (!shortlinkList[index].isCopiedToClipboard) {
-      navigator.clipboard.writeText(shortlinkList[index].shortLink)
-      const newList = shortlinkList.map(
-        item => {
-          return { originalLink: item.originalLink, shortLink: item.shortLink, isCopiedToClipboard: false }
-        })
-      newList[index].isCopiedToClipboard = true;
-      setShortlinkList(newList)
-    }
+  const handleShortlinkClick = (shortLink: string) => {
+    navigator.clipboard.writeText(shortLink)
+    dispatch({ type: 'SET_ACTIVE_CLIPBOARD', value: shortLink })
   }
 
   return (
@@ -138,11 +144,12 @@ function App() {
         </div>
         <ul>
           {shortlinkList.length > 0 &&
-            shortlinkList.map((item, idx) =>
+            shortlinkList.map(item =>
               <ShortLinkContainer
                 key={item.shortLink}
                 linkData={item}
-                handleClick={() => handleShortlinkClick(idx)}
+                handleClick={() => handleShortlinkClick(item.shortLink)}
+                isActive={item.shortLink === state.activeClipboard}
               />
             )
           }
