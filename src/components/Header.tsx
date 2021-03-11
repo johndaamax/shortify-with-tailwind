@@ -21,6 +21,9 @@ const Header = () => {
                     <a href='/' className='hidden md:inline-block px-4 py-2 text-gray-400'>Login</a>
                     <button className='hidden md:inline-block btn rounded-3xl'>Sign up</button>
                 </div>
+                {/* <div className='md:hidden'>
+                    <img src="./images/hamburger.svg" alt="Button that opens navigation on mobile resolutions" />
+                </div> */}
             </nav>
         </header>
     )

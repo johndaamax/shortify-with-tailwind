@@ -106,11 +106,11 @@ function App() {
     <div >
       <Header />
       <section className='flex justify-center items-center flex-col md:justify-between md:flex-row px-8 pt-4 pb-24 md:px-24 leading-8 text-center md:text-left'>
-        <div className='md:order-2 w-3/4 md:w-2/5 md:min-w-1/2 md:ml-4 md:relative md:left-20 my-4 md:my-0'>
-          <img src='./images/illustration-working.svg' alt='working' className='' />
+        <div className='md:order-2 md:-mr-8 my-4 md:my-0'>
+          <img src='./images/illustration-working.svg' alt='working' className='object-cover w-full max-w-md md:w-96 lg:w-112 xl:w-120' />
         </div>
-        <div>
-          <p className='text-5xl md:text-6xl font-bold leading-tight'>More than just shorter links</p>
+        <div className='md:pr-4'>
+          <p className='text-4xl lg:text-6xl font-bold'>More than just shorter links</p>
           <p className='text-gray-400 my-4'>Build your brand's recognition and get detailed insights on how your links are performing</p>
           <button className='btn rounded-3xl'>Get started</button>
         </div>
@@ -118,7 +118,7 @@ function App() {
 
       <section className='px-8 py-4 md:px-24 bg-gray-200'>
         <div className='bg-cover -mt-20 mb-4'>
-          <div className='p-6 md:p-6 lg:p-8 form-section rounded-md bg-purple-900'>
+          <div className='form-section-mobile md:form-section-desktop p-6 md:p-6 lg:p-8 rounded-md bg-indigo-dark'>
             <form onSubmit={handleSubmit}>
               <div className='md:flex md:justify-between'>
                 <div className='w-full md:mr-6 flex-1'>
@@ -182,7 +182,7 @@ function App() {
         </div>
       </section>
 
-      <section className='boost-banner-mobile md:boost-banner-desktop px-8 py-16 md:px-24 bg-purple-900 bg-cover text-center'>
+      <section className='boost-banner-mobile md:boost-banner-desktop px-8 py-16 md:px-24 bg-indigo-dark bg-cover text-center'>
         <h2 className='text-white text-2xl md:text-4xl font-bold mb-4'>Boost your links today!</h2>
         <button className='btn rounded-3xl'>Get Started</button>
       </section>

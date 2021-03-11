@@ -18,30 +18,28 @@
   }
 }
 
+@layer utilities {
+  @variants responsive {
+    .boost-banner-desktop {
+      background-image: url('/src/assets/bg-boost-desktop.svg');
+    }
+    .boost-banner-mobile {
+      background-image: url('/src/assets/bg-boost-mobile.svg');
+    }
+
+    .form-section-desktop {
+      background-image: url('/src/assets/bg-shorten-desktop.svg');
+    }
+    .form-section-mobile {
+      background-image: url('/src/assets/bg-shorten-mobile.svg');
+    }
+  }
+}
+
 body {
   font-family: 'Poppins', sans-serif;
 }
 
-.form-section {
-  background-image: url('/src/assets/bg-shorten-desktop.svg');
-}
-
-.boost-banner-desktop {
-  background-image: url('/src/assets/bg-boost-desktop.svg');
-}
-.boost-banner-mobile {
-  background-image: url('/src/assets/bg-boost-mobile.svg');
-}
-
 .footer-logo {
   filter: invert(100%) sepia(63%) saturate(2%) hue-rotate(319deg) brightness(109%) contrast(100%);
-}
-
-.statistics-icon {
-  top: -40px;
-  left: 30px;
-}
-
-.form-container {
-  position: relative;
 }

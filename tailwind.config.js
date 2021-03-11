@@ -3,8 +3,17 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      spacing: {
+        '112': '28rem',
+        '120': '30rem',
+      },
       colors: {
-        'indigo-dark': '#2D2E41'
+        'indigo-dark': '#3A3053',
+        'grey-dark': '#232027'
+      },
+      fontSize: {
+        '5xl': ['3rem', '4.25rem'],
+        '6xl': ['3.75rem', '4.25rem']
       },
       minWidth: {
         '0': '0',
