@@ -2,7 +2,7 @@ import CategoryList from './CategoryList'
 
 const Footer = () => {
     return (
-        <footer className='flex flex-col justify-center items-center md:flex-row md:justify-between md:items-start bg-grey-dark px-8 py-8 md:py-12 md:px-24'>
+        <footer className='flex flex-col justify-center items-center md:flex-row md:justify-between md:items-start bg-grey-dark padding-horizontal py-8 md:py-12'>
             <div>
                 <a href='/' className='inline-block mb-8 md:mb-0'>
                     <img src="./images/logo.png" alt="Shortify Logo" className='w-48 md:w-36 footer-logo' />

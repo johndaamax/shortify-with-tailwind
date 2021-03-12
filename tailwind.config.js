@@ -9,7 +9,8 @@ module.exports = {
       },
       colors: {
         'indigo-dark': '#3A3053',
-        'grey-dark': '#232027'
+        'grey-dark': '#232027',
+        'teal-primary': '#2CD0D1'
       },
       fontSize: {
         '5xl': ['3rem', '4.25rem'],
@@ -27,6 +28,9 @@ module.exports = {
         '2/5': '40%',
         '3/5': '60%',
         '4/5': '80%',
+      },
+      margin: {
+        '-30': '-7.5rem',
       }
     },
   },

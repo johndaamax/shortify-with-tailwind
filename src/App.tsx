@@ -1,8 +1,10 @@
 import * as React from 'react';
 
 import { useLocalStorageState } from './hooks/useLocalStorage'
+import { copyToClipboard } from './util'
 
 import Header from './components/Header'
+import MobileNav from './components/MobileNav'
 import Footer from './components/Footer'
 import StatisticsCard from './components/StatisticsCard'
 import ShortLinkContainer from './components/ShortLinkContainer'
@@ -27,7 +29,8 @@ type State = {
   error: { errorMessage: string, errorCode: number } | null,
   inputValue: string
   isLoading: boolean,
-  activeClipboard: string
+  activeClipboard: string,
+  showMobileNav: boolean
 }
 
 type Action =
@@ -36,6 +39,7 @@ type Action =
   | { type: 'REQUEST_FAILURE', error: Error }
   | { type: 'USER_INPUT_CHANGE', value: string }
   | { type: 'SET_ACTIVE_CLIPBOARD', value: string }
+  | { type: 'TOGGLE_MOBILE_NAV' }
 
 const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
   switch (action.type) {
@@ -54,6 +58,8 @@ const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
       return { ...state, inputValue: action.value }
     case 'SET_ACTIVE_CLIPBOARD':
       return { ...state, activeClipboard: action.value }
+    case 'TOGGLE_MOBILE_NAV':
+      return { ...state, showMobileNav: !state.showMobileNav }
     default:
       throw new Error("Invalid type")
   }
@@ -65,7 +71,8 @@ function App() {
       error: null,
       inputValue: '',
       isLoading: false,
-      activeClipboard: ''
+      activeClipboard: '',
+      showMobileNav: false
     })
   const [shortlinkList, setShortlinkList] = useLocalStorageState<ShortLinkListItem[]>('linkList', [])
 
@@ -98,15 +105,25 @@ function App() {
   }
 
   const handleShortlinkClick = (shortLink: string) => {
-    navigator.clipboard.writeText(shortLink)
-    dispatch({ type: 'SET_ACTIVE_CLIPBOARD', value: shortLink })
+    if (state.activeClipboard !== shortLink) {
+      copyToClipboard(shortLink)
+        .then(() => {
+          dispatch({ type: 'SET_ACTIVE_CLIPBOARD', value: shortLink })
+        })
+        .catch(error => console.log(error))
+    }
+  }
+
+  const toggleNav = () => {
+    dispatch({ type: 'TOGGLE_MOBILE_NAV' })
   }
 
   return (
-    <div >
-      <Header />
-      <section className='flex justify-center items-center flex-col md:justify-between md:flex-row px-8 pt-4 pb-24 md:px-24 leading-8 text-center md:text-left'>
-        <div className='md:order-2 md:-mr-8 my-4 md:my-0'>
+    <div className='relative'>
+      <Header toggleMobileNav={toggleNav} />
+      <MobileNav isVisible={state.showMobileNav} />
+      <section className='flex justify-center items-center flex-col md:justify-between md:flex-row padding-horizontal pt-4 pb-24 leading-8 text-center md:text-left'>
+        <div className='md:order-2 md:-mr-8 my-4 md:my-0 select-none'>
           <img src='./images/illustration-working.svg' alt='working' className='object-cover w-full max-w-md md:w-96 lg:w-112 xl:w-120' />
         </div>
         <div className='md:pr-4'>
@@ -116,8 +133,8 @@ function App() {
         </div>
       </section>
 
-      <section className='px-8 py-4 md:px-24 bg-gray-200'>
-        <div className='bg-cover -mt-20 mb-4'>
+      <section className='padding-horizontal py-12 bg-gray-200'>
+        <div className='bg-cover -mt-30 md:-mt-24 mb-4'>
           <div className='form-section-mobile md:form-section-desktop p-6 md:p-6 lg:p-8 rounded-md bg-indigo-dark'>
             <form onSubmit={handleSubmit}>
               <div className='md:flex md:justify-between'>
@@ -159,7 +176,7 @@ function App() {
           <p className='text-lg text-gray-400'>Track how your links are performing across the web with our advanced statistics dashboard</p>
         </div>
         <div className='relative'>
-          <span className='w-1 h-4/5 lg:w-3/4 bg-green-400 lg:h-1 absolute left-1/2 lg:left-24 lg:top-28'></span>
+          <span className='w-1 h-4/5 lg:w-3/4 bg-teal-primary lg:h-1 absolute left-1/2 lg:left-24 lg:top-28'></span>
           <div className='flex justify-center items-center flex-col lg:flex-row lg:justify-evenly lg:items-start mt-24'>
             <StatisticsCard
               imgSrc='./images/icon-brand-recognition.svg'
@@ -182,7 +199,7 @@ function App() {
         </div>
       </section>
 
-      <section className='boost-banner-mobile md:boost-banner-desktop px-8 py-16 md:px-24 bg-indigo-dark bg-cover text-center'>
+      <section className='boost-banner-mobile md:boost-banner-desktop padding-horizontal py-16 bg-indigo-dark bg-cover text-center'>
         <h2 className='text-white text-2xl md:text-4xl font-bold mb-4'>Boost your links today!</h2>
         <button className='btn rounded-3xl'>Get Started</button>
       </section>

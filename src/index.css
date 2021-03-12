@@ -3,13 +3,17 @@
 @tailwind utilities;
 
 @layer components {
+  .padding-horizontal {
+    @apply px-8 md:px-16 lg:px-24;
+  }
+
   .statistics-card-wrapper {
     @apply rounded-md max-w-full w-80 md:w-3/5 xl:w-1/4 bg-white relative text-left my-8 lg:my-0 lg:mx-4;
     height: min-content;
   }
 
   .btn {
-    @apply inline-flex justify-center items-center px-6 py-2 text-white bg-green-400 focus:outline-none hover:bg-green-300 transform transition;
+    @apply inline-flex justify-center items-center px-6 py-2 text-white font-semibold bg-teal-primary focus:outline-none hover:opacity-80 transform transition;
     height: min-content;
   }
 
