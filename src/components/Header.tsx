@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 interface HeaderProps {
     toggleMobileNav: () => void
 }
@@ -11,20 +12,20 @@ const Header = ({ toggleMobileNav }: HeaderProps) => {
                         <img src="./images/logo.png" alt="Shortify Logo" className='w-28' />
                     </a>
                     <div className='hidden md:inline-block'>
-                        <a href='/' className='px-2 lg:px-4 py-2 text-gray-400'>
+                        <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Features
                     </a>
-                        <a href='/' className='px-2 lg:px-4 py-2 text-gray-400'>
+                        <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Pricing
                     </a>
-                        <a href='/' className='px-2 lg:px-4 py-2 text-gray-400'>
+                        <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Resources
                     </a>
                     </div>
 
                 </div>
                 <div className='flex justify-center items-center hidden md:inline-block'>
-                    <a href='/' className='hidden sm:inline-block px-4 py-2 text-gray-400'>Login</a>
+                    <a href='#' className='hidden sm:inline-block px-4 py-2 text-gray-400'>Login</a>
                     <button className='hidden sm:inline-block btn rounded-3xl'>Sign up</button>
                 </div>
                 <div className='md:hidden cursor-pointer' onClick={toggleMobileNav}>

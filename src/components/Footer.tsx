@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import CategoryList from './CategoryList'
 
 const Footer = () => {
@@ -15,10 +16,10 @@ const Footer = () => {
             </div>
 
             <div className='flex justify-around w-1/2 md:w-48'>
-                <a href='!#'><img className='socials-logo' src='./images/icon-facebook.svg' alt='facebook logo' /></a>
-                <a href='!#'><img className='socials-logo' src='./images/icon-twitter.svg' alt='twitter logo' /></a>
-                <a href='!#'><img className='socials-logo' src='./images/icon-pinterest.svg' alt='pinterest logo' /></a>
-                <a href='!#'><img className='socials-logo' src='./images/icon-instagram.svg' alt='instagram logo' /></a>
+                <a href='#'><img className='socials-logo' src='./images/icon-facebook.svg' alt='facebook logo' /></a>
+                <a href='#'><img className='socials-logo' src='./images/icon-twitter.svg' alt='twitter logo' /></a>
+                <a href='#'><img className='socials-logo' src='./images/icon-pinterest.svg' alt='pinterest logo' /></a>
+                <a href='#'><img className='socials-logo' src='./images/icon-instagram.svg' alt='instagram logo' /></a>
             </div>
         </footer>
     )
