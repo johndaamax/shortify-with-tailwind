@@ -149,6 +149,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
+                  title='Shorten a link'
                   className='btn md:h-min rounded-md w-full h-min mt-4 md:m-0 md:w-auto disabled:opacity-80 disabled:cursor-not-allowed'
                   disabled={!state.inputValue || state.isLoading}
                 >
@@ -172,7 +173,7 @@ function App() {
           }
         </ul>
         <div className='mt-24 text-center'>
-          <h2 className='text-4xl font-bold'>Advanced statistics</h2>
+          <h1 className='text-4xl font-bold'>Advanced statistics</h1>
           <p className='text-lg text-gray-400'>Track how your links are performing across the web with our advanced statistics dashboard</p>
         </div>
         <div className='relative'>
