@@ -11,11 +11,16 @@
     @apply rounded-md max-w-full w-80 md:w-3/5 xl:w-1/4 bg-white relative text-left my-8 lg:my-0 lg:mx-4;
     height: min-content;
   }
+  
+  .hover-link{
+    @apply hover:opacity-80;
+  }
 
   .btn {
-    @apply inline-flex justify-center items-center px-6 py-2 text-white font-semibold bg-teal-primary focus:outline-none hover:opacity-80 transform transition;
+    @apply inline-flex justify-center items-center px-6 py-2 text-white font-semibold bg-teal-primary focus:outline-none hover-link transform transition;
     height: min-content;
   }
+
 
   .socials-logo{
     @apply w-6 h-6

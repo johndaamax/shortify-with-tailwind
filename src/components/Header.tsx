@@ -14,17 +14,16 @@ const Header = ({ toggleMobileNav }: HeaderProps) => {
                     <div className='hidden md:inline-block'>
                         <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Features
-                    </a>
+                        </a>
                         <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Pricing
-                    </a>
+                        </a>
                         <a href='#' className='px-2 lg:px-4 py-2 text-gray-400'>
                             Resources
-                    </a>
+                        </a>
                     </div>
-
                 </div>
-                <div className='flex justify-center items-center hidden md:inline-block'>
+                <div className='md:flex justify-center items-center hidden'>
                     <a href='#' className='hidden sm:inline-block px-4 py-2 text-gray-400'>Login</a>
                     <button className='hidden sm:inline-block btn rounded-3xl'>Sign up</button>
                 </div>

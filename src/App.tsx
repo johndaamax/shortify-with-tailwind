@@ -40,6 +40,7 @@ type Action =
   | { type: 'USER_INPUT_CHANGE', value: string }
   | { type: 'SET_ACTIVE_CLIPBOARD', value: string }
   | { type: 'TOGGLE_MOBILE_NAV' }
+  | { type: 'CLOSE_MOBILE_NAV' }
 
 const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
   switch (action.type) {
@@ -60,6 +61,8 @@ const appReducer: Reducer<State, Action> = (state: State, action: Action) => {
       return { ...state, activeClipboard: action.value }
     case 'TOGGLE_MOBILE_NAV':
       return { ...state, showMobileNav: !state.showMobileNav }
+    case 'CLOSE_MOBILE_NAV':
+      return { ...state, showMobileNav: false }
     default:
       throw new Error("Invalid type")
   }
@@ -75,6 +78,7 @@ function App() {
       showMobileNav: false
     })
   const [shortlinkList, setShortlinkList] = useLocalStorageState<ShortLinkListItem[]>('linkList', [])
+  const mobileNavRef = React.useRef<HTMLElement>(null);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
@@ -118,10 +122,16 @@ function App() {
     dispatch({ type: 'TOGGLE_MOBILE_NAV' })
   }
 
+  const handleClickOutsideMobileNav = (e: any) => {
+    if (mobileNavRef.current && !mobileNavRef.current.contains(e.target) && state.showMobileNav) {
+      dispatch({ type: 'CLOSE_MOBILE_NAV' })
+    }
+  }
+
   return (
-    <div className='relative'>
+    <div className='relative' onClick={handleClickOutsideMobileNav}>
       <Header toggleMobileNav={toggleNav} />
-      <MobileNav isVisible={state.showMobileNav} />
+      <MobileNav isVisible={state.showMobileNav} ref={mobileNavRef} />
       <section className='flex justify-center items-center flex-col md:justify-between md:flex-row padding-horizontal pt-4 pb-24 leading-8 text-center md:text-left'>
         <div className='md:order-2 md:-mr-8 my-4 md:my-0 select-none'>
           <img src='./images/illustration-working.svg' alt='working' className='object-cover w-full max-w-md md:w-96 lg:w-112 xl:w-120' />
@@ -199,7 +209,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className='boost-banner-mobile md:boost-banner-desktop padding-horizontal py-16 bg-indigo-dark bg-cover text-center'>
         <h2 className='text-white text-2xl md:text-4xl font-bold mb-4'>Boost your links today!</h2>
         <button className='btn rounded-3xl'>Get Started</button>

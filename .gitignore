@@ -14,5 +14,6 @@
 # misc
 .DS_Store
 debug.log*
+.eslintcache
 
 .vscode
